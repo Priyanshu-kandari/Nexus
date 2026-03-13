@@ -1,5 +1,5 @@
 const { Inngest } = require("inngest");
-const { connectDB } = require("../DB/db");
+const connectDB = require("../DB/db.js");
 const { UserModel } = require("../models/User.model");
 
 const inngest = new Inngest({ id: "Nexus" });
