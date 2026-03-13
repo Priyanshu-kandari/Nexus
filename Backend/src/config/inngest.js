@@ -9,18 +9,28 @@ const syncUser = inngest.createFunction(
   { event: "clerk/user.created" },
 
   async ({ event }) => {
-    await connectDB();
+    try {
+      await connectDB();
 
-    const { id, email_addresses, first_name, last_name, image_url } = event.data;
+      const { id, email_addresses, first_name, last_name, image_url } = event.data;
 
-    const newUser = {
-      clerkId: id,
-      email: email_addresses[0]?.email_address,
-      name: `${first_name || ""} ${last_name || ""}`.trim(),
-      image: image_url,
-    };
+      const newUser = {
+        clerkId: id,
+        email: email_addresses?.[0]?.email_address || "",
+        name: `${first_name || ""} ${last_name || ""}`.trim(),
+        image: image_url,
+      };
 
-    await UserModel.create(newUser);
+      await UserModel.findOneAndUpdate(
+        { clerkId: id },
+        newUser,
+        { upsert: true, new: true }
+      );
+
+      console.log("User synced");
+    } catch (error) {
+      console.error("Error syncing user:", error);
+    }
   }
 );
 
@@ -29,11 +39,17 @@ const deleteUser = inngest.createFunction(
   { event: "clerk/user.deleted" },
 
   async ({ event }) => {
-    await connectDB();
+    try {
+      await connectDB();
 
-    const { id } = event.data;
+      const { id } = event.data;
 
-    await UserModel.deleteOne({ clerkId: id });
+      await UserModel.deleteOne({ clerkId: id });
+
+      console.log("User deleted");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   }
 );
 
