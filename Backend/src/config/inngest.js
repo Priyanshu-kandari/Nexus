@@ -1,6 +1,6 @@
 const { Inngest } = require("inngest");
 const connectDB = require("../DB/db.js");
-const { UserModel } = require("../models/User.model");
+const UserModel = require("../models/User.model.js");
 
 const inngest = new Inngest({ id: "Nexus" });
 
